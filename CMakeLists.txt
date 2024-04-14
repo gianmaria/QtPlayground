@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
@@ -22,11 +22,17 @@ set(PROJECT_SOURCES
         ${TS_FILES}
 )
 
+# Set the icon for the executable
+if(WIN32)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/res/icon.rc")
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtPlayground
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         res/resources.qrc
+        ${app_icon_resource_windows}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtPlayground APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -76,3 +82,5 @@ install(TARGETS QtPlayground
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QtPlayground)
 endif()
+
+

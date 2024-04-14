@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/spaceship.png"));
+    setWindowIcon(QIcon(":/spaceship_icon"));
 
     QObject::connect(ui->stackedWidget, &QStackedWidget::currentChanged,
                      this, [this](int index)

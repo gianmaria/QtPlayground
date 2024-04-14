@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>spaceship.png</file>
+        <file alias="spaceship_icon">spaceship.png</file>
     </qresource>
 </RCC>
