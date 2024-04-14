@@ -21,7 +21,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_1">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -36,6 +36,13 @@
          <widget class="QPushButton" name="pb_next">
           <property name="text">
            <string>&amp;Next</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_start_program">
+          <property name="text">
+           <string>&amp;Start Program</string>
           </property>
          </widget>
         </item>

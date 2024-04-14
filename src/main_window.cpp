@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "./ui_main_window.h"
 #include <QDebug>
+#include <QProcess>
 #include <QShortcut>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -70,3 +71,46 @@ void MainWindow::closeEvent(QCloseEvent *event)
     qDebug() << "goodbyeeeeeeeeeeeee";
     QMainWindow::closeEvent(event);
 }
+
+QString MainWindow::some_var() const
+{
+    return m_some_var;
+}
+
+void MainWindow::setSome_var(const QString &newSome_var)
+{
+    if (m_some_var == newSome_var)
+        return;
+    m_some_var = newSome_var;
+    emit some_varChanged();
+}
+
+void MainWindow::on_pb_start_program_released()
+{
+    auto current_dir = QCoreApplication::applicationDirPath();
+    qDebug() << "Current dir is:" << current_dir;
+
+    auto program = QString("%1/%2").arg(current_dir).arg("nic.exe");
+    QStringList arguments;
+    // arguments << "help";
+    qDebug() << "Program is:" << program;
+
+
+    QProcess *my_process = new QProcess(this);
+
+    connect(my_process, &QProcess::readyReadStandardOutput,
+            this, [this, my_process]()
+    {
+        QByteArray data = my_process->readAllStandardOutput();
+        QString output = QString::fromUtf8(data);
+
+        // qDebug() << "Standard Output: " << output;
+        this->ui->plainTextEdit->clear();
+        this->ui->plainTextEdit->appendPlainText(output);
+
+    });
+
+    my_process->start(program, arguments);
+
+}
+
