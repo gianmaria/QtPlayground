@@ -46,6 +46,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="pb_IP">
+          <property name="text">
+           <string>&amp;IP</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="page_2">

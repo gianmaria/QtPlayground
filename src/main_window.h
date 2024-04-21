@@ -37,6 +37,8 @@ private slots:
 
     void on_pb_start_program_released();
 
+    void on_pb_IP_released();
+
 private:
     Ui::MainWindow *ui;
 

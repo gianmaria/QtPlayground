@@ -5,6 +5,15 @@
 #include <QShortcut>
 #include <QFile>
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QSslConfiguration>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -14,13 +23,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->stackedWidget, &QStackedWidget::currentChanged,
                      this, [this](int index)
-    {
-        qDebug() << "new index is:" << index;
+                     {
+                         qDebug() << "new index is:" << index;
 
-        QString msg = QString("Page %1 %2").arg(index+1).arg("Yo");
+                         QString msg = QString("Page %1 %2").arg(index+1).arg("Yo");
 
-        this->ui->statusbar->showMessage(msg, 3000);
-    });
+                         this->ui->statusbar->showMessage(msg, 3000);
+                     });
 
     QShortcut* shortcut = new QShortcut(
         QKeySequence(Qt::CTRL | Qt::Key_A),
@@ -28,9 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(shortcut, &QShortcut::activated,
                      this, []()
-    {
-        qDebug() << "Shortcut triggered!";
-    });
+                     {
+                         qDebug() << "Shortcut triggered!";
+                     });
 
 
     QKeySequence seq(Qt::Key_Escape);
@@ -108,27 +117,88 @@ void MainWindow::on_pb_start_program_released()
 
     connect(my_process, &QProcess::readyReadStandardOutput,
             this, [this, my_process]()
-    {
-        QByteArray data = my_process->readAllStandardOutput();
+            {
+                QByteArray data = my_process->readAllStandardOutput();
 
-        char char_to_remove = '\0'; 
-        int index = data.indexOf(char_to_remove);
-        while (index != -1) 
-        {
-            data.remove(index, 1); // Remove 1 character at index
-            index = data.indexOf(char_to_remove, index); // Find next occurrence
-        }
+                char char_to_remove = '\0';
+                int index = data.indexOf(char_to_remove);
+                while (index != -1)
+                {
+                    data.remove(index, 1); // Remove 1 character at index
+                    index = data.indexOf(char_to_remove, index); // Find next occurrence
+                }
 
 
-        QString output = QString::fromUtf8(data);
+                QString output = QString::fromUtf8(data);
 
-        // qDebug() << "Standard Output: " << output;
-        this->ui->plainTextEdit->clear();
-        this->ui->plainTextEdit->appendPlainText(output);
+                // qDebug() << "Standard Output: " << output;
+                this->ui->plainTextEdit->clear();
+                this->ui->plainTextEdit->appendPlainText(output);
 
-    });
+            });
 
     my_process->start(program, arguments);
 
+}
+
+
+void MainWindow::on_pb_IP_released()
+{
+    auto* manager = new QNetworkAccessManager(this);
+
+    QUrl url("https://api.ipify.org?format=json");
+    auto* request = new QNetworkRequest(url);
+
+    // Optionally, configure SSL if necessary (e.g., for self-signed certificates)
+    QSslConfiguration sslConfig = request->sslConfiguration();
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
+    request->setSslConfiguration(sslConfig);
+
+    // Make the HTTPS GET request
+    QNetworkReply *reply = manager->get(*request);
+
+    // Connect signals to handle the response
+    QObject::connect(reply, &QNetworkReply::finished, this,
+                     [this, reply, request, manager]() {
+        if (reply->error() == QNetworkReply::NoError)
+        {
+            // Successful request, read the response data
+            QByteArray responseData = reply->readAll();
+            qDebug() << "Response:" << responseData;
+
+
+
+            // Parse the JSON input
+            QJsonParseError error;
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData, &error);
+
+            if (error.error != QJsonParseError::NoError)
+            {
+                qDebug() << "Parse error:" << error.errorString();
+                return;
+            }
+
+            if (jsonDoc.isObject())
+            {
+                QJsonObject jsonObj = jsonDoc.object();
+                if (jsonObj.contains("ip"))
+                {
+                    auto the_ip = jsonObj["ip"].toString("??????");
+                    this->ui->plainTextEdit->clear();
+                    this->ui->plainTextEdit->appendPlainText(the_ip);
+                }
+            }
+        }
+        else
+        {
+            // Error handling
+            qDebug() << "Error:" << reply->errorString();
+        }
+
+        // Clean up
+        reply->deleteLater();
+        delete request;
+        manager->deleteLater();
+    });
 }
 
