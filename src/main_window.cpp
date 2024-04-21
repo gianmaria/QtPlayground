@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QShortcut>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -95,6 +96,13 @@ void MainWindow::on_pb_start_program_released()
     // arguments << "help";
     qDebug() << "Program is:" << program;
 
+    QFile file(program);
+
+    if (not file.exists()) 
+    {
+        qDebug() << "File does not exist.";
+        return;
+    }
 
     QProcess *my_process = new QProcess(this);
 
@@ -102,6 +110,16 @@ void MainWindow::on_pb_start_program_released()
             this, [this, my_process]()
     {
         QByteArray data = my_process->readAllStandardOutput();
+
+        char char_to_remove = '\0'; 
+        int index = data.indexOf(char_to_remove);
+        while (index != -1) 
+        {
+            data.remove(index, 1); // Remove 1 character at index
+            index = data.indexOf(char_to_remove, index); // Find next occurrence
+        }
+
+
         QString output = QString::fromUtf8(data);
 
         // qDebug() << "Standard Output: " << output;
