@@ -30,7 +30,7 @@ qt_add_executable(QtPlayground
         ${app_icon_resource_windows}
 )
 
-target_link_libraries(QtPlayground PRIVATE Qt6::Widgets Qt6::Network)
+target_link_libraries(QtPlayground PRIVATE Qt6::CorePrivate Qt6::Widgets Qt6::Network)
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QtPlayground)

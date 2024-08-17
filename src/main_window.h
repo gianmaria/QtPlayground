@@ -39,6 +39,8 @@ private slots:
 
     void on_pb_IP_released();
 
+    void on_pb_next_clicked();
+
 private:
     Ui::MainWindow *ui;
 
